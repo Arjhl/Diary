@@ -8,6 +8,7 @@ import DiaryCard from "../components/DiaryCard";
 import { SimpleGrid } from "@chakra-ui/react";
 import NewDiary from "../components/NewDiary";
 import Diary from "../components/Diary";
+import ImageUploadButton from "../components/UploadButton";
 
 const titles = [
   "WHy night is So young",
