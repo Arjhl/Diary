@@ -15,9 +15,10 @@ model User {
 }
 
 model Diaries {
-    id Int @id @default(autoincrement())
-    user_id String
+    id String @id 
+    userid String
     title String
-    diary String
+    diary String @db.LongText
     createdAt DateTime @default(now())
+    isPublic Boolean @default(false)
 }

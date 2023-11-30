@@ -12,29 +12,24 @@ type propTypes = {
 };
 
 export function Providers(props: propTypes) {
+  const [isLoading, setIsLoading] = useState(false);
   const ctx = useContext(UserContext);
-  const [userData, setUserData] = useState({
-    id: "",
-    email: "",
-    username: "",
-  });
 
   useEffect(() => {
-    printData();
-  });
+    updateCtx();
+  }, []);
 
-  const printData = async () => {
+  const updateCtx = async () => {
     const res = await props.data;
+    setIsLoading(true);
     console.log(res);
-
     ctx.userData = res;
-    setUserData(res);
   };
 
   return (
-    <UserContext.Provider value={{ key: "", userData }}>
+    <UserContext.Provider value={ctx}>
       <CacheProvider>
-        <ChakraProvider>{props.children}</ChakraProvider>
+        <ChakraProvider>{isLoading && props.children}</ChakraProvider>
       </CacheProvider>
     </UserContext.Provider>
   );
