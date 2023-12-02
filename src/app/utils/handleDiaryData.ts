@@ -4,19 +4,24 @@ export const saveDiary = async (
   data: string,
   title: string,
   id: string,
-  userid: string
+  userid: string,
+  isPublic: boolean
 ) => {
+  const resObj = {
+    id: id,
+    userid: userid,
+    diary: data,
+    title: title,
+    isPublic: isPublic,
+  };
+
+  console.log(resObj);
   const response = await fetch("http://localhost:3000/api/diaries", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({
-      id: id,
-      userid: userid,
-      diary: data,
-      title: title,
-    }),
+    body: JSON.stringify(resObj),
   });
   const d = await response.json();
   return d;

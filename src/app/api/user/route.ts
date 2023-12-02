@@ -23,6 +23,19 @@ export async function POST(request: NextRequest) {
     },
   });
   if (user) {
+    if (user.username != body.username) {
+      const result = await prisma.user.update({
+        where: {
+          id: body.id,
+        },
+        data: {
+          email,
+          id: body.id,
+          username: body.username,
+        },
+      });
+      return NextResponse.json(result);
+    }
     return NextResponse.json(user);
   }
   console.log("req body", body);
@@ -30,6 +43,7 @@ export async function POST(request: NextRequest) {
     data: {
       email: body.email,
       id: body.id,
+      username: body.username ? body.username : "",
     },
   });
 

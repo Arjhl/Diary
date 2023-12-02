@@ -3,14 +3,18 @@ import { useContext, useEffect, useState } from "react";
 import { UserContext } from "../store/userContext";
 import { useToast } from "@chakra-ui/react";
 
-const KeyInput = () => {
+type propTypes = {
+  onKeyChange?: Function;
+};
+
+const KeyInput = (props: propTypes) => {
   const ctx = useContext(UserContext);
   const toast = useToast();
-  const [isKeySet, setIsKeySet] = useState(ctx.key ? true : false);
+  const [isKeySet, setIsKeySet] = useState(ctx.key.length != 0 ? true : false);
   const [keyValue, setKeyValue] = useState("");
 
   useEffect(() => {
-    if (ctx.key != "") setIsKeySet(true);
+    if (ctx.key.length != 0) setIsKeySet(true);
   }, [ctx.key]);
 
   const submitHandler = (e: any) => {
@@ -26,8 +30,12 @@ const KeyInput = () => {
       });
       return;
     }
-    console.log(keyValue.split("").map((e) => Number(e)));
     ctx.key = keyValue;
+    if (props.onKeyChange) {
+      props.onKeyChange();
+    }
+
+    setIsKeySet(true);
   };
 
   return (

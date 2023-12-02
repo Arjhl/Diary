@@ -1,7 +1,16 @@
 "use client";
 import { createContext, useContext } from "react";
 
-const defaultValue = {
+type contextType = {
+  userData: {
+    id: string;
+    email: string;
+    username: string;
+  };
+  key: string;
+};
+
+const defaultValue: contextType = {
   userData: {
     id: "",
     email: "",

@@ -1,6 +1,7 @@
 const aesjs = require("aes-js");
 
 const encrypt = (data: any, key: any) => {
+  console.log(key);
   var textBytes = aesjs.utils.utf8.toBytes(JSON.stringify(data));
   var aesCtr = new aesjs.ModeOfOperation.ctr(key);
   var encryptedBytes = aesCtr.encrypt(textBytes);

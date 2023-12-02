@@ -34,6 +34,7 @@ export default function RootLayout({
     });
     const data = await response.json();
     console.log(data);
+
     return {
       id: data.id,
       email: data.email,

@@ -7,6 +7,7 @@ const diarySchema = z.object({
   userid: z.string(),
   title: z.string(),
   diary: z.string(),
+  isPublic: z.boolean(),
 });
 
 export async function POST(request: NextRequest) {
@@ -22,14 +23,15 @@ export async function POST(request: NextRequest) {
       select: {
         id: true,
         title: true,
+        createdAt: true,
       },
     });
     console.log(res);
 
     return NextResponse.json(res, { status: 201 });
   } else {
-    const { id, userid, title, diary } = body;
-
+    const { id, userid, title, diary, isPublic } = body;
+    console.log(body);
     const validation = diarySchema.safeParse(body);
     console.log("Validation", validation);
 
@@ -48,8 +50,11 @@ export async function POST(request: NextRequest) {
           id: body.id,
         },
         data: {
+          id: body.id,
+          userid: userid,
           diary: diary,
           title: title,
+          isPublic: isPublic,
         },
       });
 
@@ -63,6 +68,7 @@ export async function POST(request: NextRequest) {
         userid: userid,
         diary: diary,
         title: title,
+        isPublic: isPublic,
       },
     });
 

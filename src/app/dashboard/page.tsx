@@ -1,6 +1,4 @@
 "use client";
-import { currentUser } from "@clerk/nextjs";
-import { Button } from "@chakra-ui/react";
 import { useContext } from "react";
 import { useEffect, useState } from "react";
 import DashboardHeader from "../components/DashboardHeader";
@@ -12,19 +10,13 @@ import { getAllDiaryList } from "@/app/utils/handleDiaryData";
 import { UserContext } from "../store/userContext";
 import KeyInput from "../components/KeyInput";
 
-const titles = [
-  "WHy night is So young",
-  "Bruhhhhhhh -_-",
-  "i dont care how many lies i hear",
-  "my heart still wants u",
-];
-
 const DashBoard = () => {
   const [showDiary, setShowDiary] = useState(false);
   const [diaryList, setDiaryList] = useState<
     {
       id: string;
       title: string;
+      createdAt: string;
     }[]
   >([]);
   const ctx = useContext(UserContext);
@@ -55,7 +47,14 @@ const DashBoard = () => {
           {diaryList?.map((t, i) => {
             //send id and title both
             console.log(t);
-            return <DiaryCard key={t.id} title={t.title} id={t.id} />;
+            return (
+              <DiaryCard
+                key={t.id}
+                title={t.title}
+                id={t.id}
+                date={t.createdAt}
+              />
+            );
           })}
         </SimpleGrid>
       )}

@@ -1,6 +1,6 @@
 const aesjs = require("aes-js");
 
-const decrypt = (value: any, key: any) => {
+const decrypt = (value: any, key: number[]) => {
   var encryptedBytes = aesjs.utils.hex.toBytes(value ? value : "");
 
   var aesCtr = new aesjs.ModeOfOperation.ctr(key);

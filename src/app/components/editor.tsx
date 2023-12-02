@@ -1,6 +1,6 @@
 // this registers <Editor> as a Client Component
 "use client";
-import { BlockNoteEditor, PartialBlock } from "@blocknote/core";
+import { BlockNoteEditor } from "@blocknote/core";
 import { BlockNoteView, useBlockNote } from "@blocknote/react";
 import "@blocknote/core/style.css";
 import DashboardHeader from "../components/DashboardHeader";
@@ -23,17 +23,14 @@ type propTypes = {
   blockData: any;
   title: string;
   id: string;
+  getBlockData: Function;
+  getTitle: Function;
 };
 
 export default function Editor(props: propTypes) {
-  const [savedBlocks, setSavedBlocks] = useState<any>([]);
-  const [blockData, setBlockData] = useState(props.blockData);
-  const [diaryTitle, setDiaryTitle] = useState(props.title);
   const toast = useToast();
-  const titleRef = useRef<any>();
-  const ctx = useContext(UserContext);
+
   useLeavePageConfirm(false);
-  const router = useRouter();
 
   const { startUpload, permittedFileInfo } = useUploadThing("imageUploader", {
     onClientUploadComplete: (res) => {
@@ -60,56 +57,27 @@ export default function Editor(props: propTypes) {
 
   const editor: BlockNoteEditor | null = useBlockNote({
     uploadFile: uploadFiles,
-    initialContent: blockData,
+    initialContent: props.blockData,
   });
 
   editor.onEditorContentChange(() => {
     const blocks = editor.topLevelBlocks;
     console.log("Content was changed:", blocks);
-    setSavedBlocks(blocks);
+    props.getBlockData(blocks);
   });
 
-  // Renders the editor instance using a React component.
-
-  const saveHandler = async () => {
-    const newUuid = uuid();
-
-    if (ctx.key == "" || ctx.key == undefined) {
-      toast({
-        title: "No KEY is specified.",
-        description:
-          "Enter the key and then save again to save your diary to the database.",
-        status: "error",
-        duration: 9000,
-        isClosable: true,
-      });
-      return;
-    }
-    const diaryEncrypted = encrypt(savedBlocks, ctx.key);
-    //send that to db
-    //add a title component
-    // title =  titleRef.current.value
-    // saveDiary(diaryEncrypted);
-    saveDiary(
-      diaryEncrypted,
-      titleRef?.current?.value,
-      props.id,
-      ctx.userData.id
-    );
-  };
-
+  //make a new component for title
   return (
     <div>
-      <KeyInput />
-      <p
+      <p>{props.title}</p>
+      <Input
+        onChange={(e) => {
+          props.getTitle(e.target.value);
+        }}
         placeholder="Enter title : this content will not be encrypted"
-        ref={titleRef}
         contentEditable
-      >
-        {diaryTitle}
-      </p>
+      />
       <BlockNoteView className=" bg-white" editor={editor} theme={"light"} />
-      <Button onClick={saveHandler}>Submit</Button>
     </div>
   );
 }

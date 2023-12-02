@@ -3,6 +3,7 @@ type propTypes = {
 };
 
 const ReadonlyDiary = (props: propTypes) => {
+  console.log("READ ONLY DIARY", props.blockData);
   return <h1>Read only Diary</h1>;
 };
 
