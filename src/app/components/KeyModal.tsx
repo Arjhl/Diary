@@ -1,19 +1,16 @@
 import {
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalFooter,
-  ModalBody,
-  ModalCloseButton,
-  useDisclosure,
-  FormControl,
-  Button,
-  Input,
-  useToast,
-} from "@chakra-ui/react";
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/app/components/ui/dialog";
 
 import { useEffect, useRef, useState } from "react";
+import { Button } from "./ui/button";
+import { Input } from "./ui/input";
+import { useToast } from "./ui/use-toast";
 
 type proptypes = {
   setKey: Function;
@@ -22,67 +19,59 @@ type proptypes = {
 
 const KeyModal = (props: proptypes) => {
   const [key, setKey] = useState("");
-  const toast = useToast();
-  const { isOpen, onOpen, onClose } = useDisclosure();
+  const { toast } = useToast();
+  const [isOpen, setIsopen] = useState(false);
+
   const initialRef = useRef<any>();
 
   useEffect(() => {
     if (props.isPublic) {
-      onOpen();
+      setIsopen(true);
     }
   }, []);
 
   return (
-    <Modal
-      initialFocusRef={initialRef}
-      isOpen={isOpen}
-      onClose={onClose}
-      closeOnOverlayClick={false}
-    >
-      <ModalOverlay />
-      <ModalContent>
-        <ModalHeader>Enter Your Public Key</ModalHeader>
-        <ModalBody pb={6}>
-          <FormControl>
+    <>
+      <Dialog open={isOpen}>
+        <DialogTrigger>Open</DialogTrigger>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="my-2">Enter Your Public Key</DialogTitle>
             <Input
               ref={initialRef}
               type="number"
               min={8}
               max={8}
               placeholder="Public Key"
-              onChange={(e) => {
+              onChange={(e: any) => {
                 setKey(e.target.value);
               }}
             />
-            <p className=" text-red-800 text-center font-bold">
-              If public key not provided this diary cannot be accessed
+            <p className=" text-red-600 text-center font-bold">
+              If public key not provided this diary cannot be accessed.
             </p>
-          </FormControl>
-        </ModalBody>
-        <ModalFooter>
+          </DialogHeader>
           <Button
-            mr={3}
             type="submit"
             onClick={() => {
               console.log(key.length);
               if (key?.length !== 8) {
                 toast({
                   title: "Key not valid.",
-                  status: "error",
+                  variant: "destructive",
                   duration: 9000,
-                  isClosable: true,
                 });
               } else {
                 props.setKey(key);
-                onClose();
+                setIsopen(false);
               }
             }}
           >
             Save
           </Button>
-        </ModalFooter>
-      </ModalContent>
-    </Modal>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 };
 

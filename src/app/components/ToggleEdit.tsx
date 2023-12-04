@@ -1,6 +1,6 @@
 "use client";
-import { Button } from "@chakra-ui/react";
 import { useState, useEffect } from "react";
+import { Button } from "./ui/button";
 
 type propTypes = {
   saveHandler: Function;
@@ -33,8 +33,16 @@ const ToggleEdit = (props: propTypes) => {
 
   return (
     <>
-      {!isEdit && <Button onClick={editButtonClick}>Edit</Button>}
-      {isEdit && <Button onClick={saveButtonClick}>Save</Button>}
+      {!isEdit && (
+        <Button onClick={editButtonClick} variant="default" size={"sm"}>
+          Edit
+        </Button>
+      )}
+      {isEdit && (
+        <Button onClick={saveButtonClick} variant="default" size={"sm"}>
+          Save
+        </Button>
+      )}
     </>
   );
 };

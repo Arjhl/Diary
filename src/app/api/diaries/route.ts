@@ -114,3 +114,15 @@ export async function GET(request: NextRequest) {
 
   return NextResponse.json(result, { status: 201 });
 }
+
+export async function DELETE(request: NextRequest) {
+  const reqId = request.nextUrl.searchParams.get("id");
+
+  const res = await prisma.diaries.delete({
+    where: {
+      id: reqId?.toString(),
+    },
+  });
+
+  return NextResponse.json(res, { status: 201 });
+}

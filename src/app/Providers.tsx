@@ -1,10 +1,9 @@
 // app/providers.tsx
 "use client";
-
-import { CacheProvider } from "@chakra-ui/next-js";
-import { ChakraProvider } from "@chakra-ui/react";
 import { useContext, useEffect, useState } from "react";
 import { UserContext } from "./store/userContext";
+import { Toaster } from "./components/ui/toaster";
+import { ThemeProvider } from "./components/ThemeProvider";
 
 type propTypes = {
   children: React.ReactNode;
@@ -28,9 +27,15 @@ export function Providers(props: propTypes) {
 
   return (
     <UserContext.Provider value={ctx}>
-      <CacheProvider>
-        <ChakraProvider>{isLoading && props.children}</ChakraProvider>
-      </CacheProvider>
+      <ThemeProvider
+        attribute="class"
+        defaultTheme="system"
+        enableSystem
+        disableTransitionOnChange
+      >
+        {isLoading && props.children}
+        <Toaster />
+      </ThemeProvider>
     </UserContext.Provider>
   );
 }

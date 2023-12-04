@@ -1,19 +1,19 @@
 //this component is used to make a diary public which also collects the key
-import { Switch, useDisclosure, useToast } from "@chakra-ui/react";
-import { FormLabel } from "@chakra-ui/react";
+import { useToast } from "@/app/components/ui/use-toast";
 import {
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalFooter,
-  ModalBody,
-  FormControl,
-  Button,
-  Input,
-  ModalCloseButton,
-} from "@chakra-ui/react";
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/app/components/ui/dialog";
 import { useEffect, useRef, useState } from "react";
+import { Input } from "./ui/input";
+import { Button } from "./ui/button";
+import { DialogClose } from "@radix-ui/react-dialog";
+import { useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 
 type propTypes = {
   isPublic: boolean;
@@ -22,89 +22,93 @@ type propTypes = {
 };
 
 const DiaryToggle = (props: propTypes) => {
-  const { isOpen, onOpen, onClose } = useDisclosure();
   const [key, setkey] = useState("");
-  const [switchState, setSwitchState] = useState(props.isPublic);
-  const initialRef = useRef<any>();
-  const toast = useToast();
+  const router = useRouter();
+  const { toast } = useToast();
+  const [isDiaryPublic, setIsDiaryPublic] = useState(props.isPublic);
+  const params = useParams();
 
   useEffect(() => {
-    setSwitchState(props.isPublic);
-  }, []);
+    if (props.isPublic) {
+      setIsDiaryPublic(true);
+    }
+  }, [props]);
 
   const saveHandler = () => {
     if (key?.length != 8) {
       toast({
         title: "Key Not Entered.",
         description: "Need to key to encrypt the public data.",
-        status: "error",
+        variant: "destructive",
         duration: 9000,
-        isClosable: true,
       });
-      setSwitchState(!switchState);
     }
-    onClose();
-    if (!switchState) {
-      const result = props.setPublic(key);
-      setSwitchState(result);
-    } else {
-      const result = props.makePrivate(key);
-      if (result == true) {
-        setSwitchState(false);
+    if (key.length == 8) {
+      if (props.isPublic) {
+        const res = props.makePrivate(key);
+        if (res) {
+          setIsDiaryPublic(false);
+          toast({
+            title: "Woah!!,This Diary is now Private.",
+          });
+        }
+      } else {
+        const res = props.setPublic(key);
+        setIsDiaryPublic(res);
+        toast({
+          title: "This Diary is now Public.",
+          action: (
+            <Button
+              onClick={() => {
+                router.push(`http://localhost:3000/public/${params.id}`);
+              }}
+              variant="outline"
+            >
+              Public Link
+            </Button>
+          ),
+        });
       }
     }
   };
 
   return (
-    <div className="flex">
-      <FormLabel>Make this diary Public?</FormLabel>
-      <Switch onChange={onOpen} isChecked={switchState} />
+    <div>
+      <Dialog>
+        <DialogTrigger>
+          {!isDiaryPublic && (
+            <Button variant="destructive" size={"sm"}>
+              Make Public
+            </Button>
+          )}
+          {isDiaryPublic && (
+            <Button variant="default" size={"sm"}>
+              Make Private
+            </Button>
+          )}
+        </DialogTrigger>
 
-      <Modal
-        initialFocusRef={initialRef}
-        isOpen={isOpen}
-        onClose={onClose}
-        closeOnOverlayClick={false}
-      >
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>Enter Your Public Key</ModalHeader>
-          <ModalCloseButton
-            onClick={() => {
-              setSwitchState(false);
-              onClose();
-            }}
-          />
-          <ModalBody pb={6}>
-            <FormControl>
-              <Input
-                ref={initialRef}
-                type="number"
-                min={8}
-                max={8}
-                placeholder="Public Key"
-                onChange={(e) => {
-                  setkey(e.target.value);
-                }}
-              />
-            </FormControl>
-          </ModalBody>
-          <ModalFooter>
-            <Button mr={3} type="submit" onClick={saveHandler}>
-              Save
-            </Button>
-            <Button
-              onClick={() => {
-                //setpublic false
-                setSwitchState(false);
-                onClose();
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Enter Your Public Key</DialogTitle>
+            <Input
+              type="number"
+              min={8}
+              max={8}
+              placeholder="Public Key"
+              onChange={(e) => {
+                setkey(e.target.value);
               }}
-            >
-              Cancel
-            </Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
+            />
+            <DialogClose>
+              <Button onClick={saveHandler}>Save</Button>
+            </DialogClose>
+            <DialogDescription>
+              This is the Public key which is used to decrpyt data.
+            </DialogDescription>
+          </DialogHeader>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

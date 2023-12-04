@@ -1,10 +1,26 @@
+import Editor from "./editor";
+
 type propTypes = {
-  blockData: any;
+  data: any;
+  title: string;
+  date: string;
 };
 
 const ReadonlyDiary = (props: propTypes) => {
-  console.log("READ ONLY DIARY", props.blockData);
-  return <h1>Read only Diary</h1>;
+  console.log("READ ONLY DIARY", props.data);
+
+  return (
+    <div className="w-full h-screen">
+      <Editor
+        blockData={props.data}
+        title={props.title}
+        editable={false}
+        getBlockData={() => {}}
+        getTitle={() => {}}
+        date={props.date}
+      />
+    </div>
+  );
 };
 
 export default ReadonlyDiary;

@@ -3,7 +3,6 @@ import { useContext } from "react";
 import { useEffect, useState } from "react";
 import DashboardHeader from "../components/DashboardHeader";
 import DiaryCard from "../components/DiaryCard";
-import { SimpleGrid } from "@chakra-ui/react";
 import Diary from "../components/Diary";
 import NewDiaryCard from "../components/NewDiaryCard";
 import { getAllDiaryList } from "@/app/utils/handleDiaryData";
@@ -32,12 +31,16 @@ const DashBoard = () => {
     getDiaryList();
   }, []);
 
+  const refreshState = () => {
+    getDiaryList();
+  };
+
   return (
-    <div className="mx-10">
+    <div className="sm:mx-10 mx-2">
       <DashboardHeader />
       <KeyInput />
       {!showDiary && (
-        <SimpleGrid columns={1} spacing={0}>
+        <div>
           <div
             onClick={() => {
               setShowDiary(true);
@@ -53,10 +56,11 @@ const DashBoard = () => {
                 title={t.title}
                 id={t.id}
                 date={t.createdAt}
+                refreshState={refreshState}
               />
             );
           })}
-        </SimpleGrid>
+        </div>
       )}
       {showDiary && <Diary />}
     </div>

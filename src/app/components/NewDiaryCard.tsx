@@ -1,5 +1,3 @@
-import { Heading, Box } from "@chakra-ui/react";
-import { DeleteIcon } from "@chakra-ui/icons";
 import { v4 as uuid } from "uuid";
 import { saveDiary } from "../utils/handleDiaryData";
 import { useContext } from "react";
@@ -7,7 +5,9 @@ import { UserContext } from "../store/userContext";
 import { useRouter } from "next/navigation";
 import encrypt from "../utils/encyrpt";
 import { keyFormatter } from "../utils/keyFormatter";
-import { useToast } from "@chakra-ui/react";
+import { Card } from "./ui/card";
+import { useToast } from "./ui/use-toast";
+import { Button } from "./ui/button";
 
 const emptyDiaryData = [
   {
@@ -47,7 +47,7 @@ const emptyDiaryData = [
 ];
 
 const NewDiaryCard = () => {
-  const toast = useToast();
+  const { toast } = useToast();
   const ctx = useContext(UserContext);
   const router = useRouter();
   const generateNewDiary = () => {
@@ -58,9 +58,8 @@ const NewDiaryCard = () => {
       toast({
         title: "Enter key.",
         description: "Enter the key to generate a new Diary",
-        status: "error",
+        variant: "destructive",
         duration: 9000,
-        isClosable: true,
       });
       return;
     }
@@ -70,15 +69,13 @@ const NewDiaryCard = () => {
   };
 
   return (
-    <Box
-      className=" text-center bg-slate-400 px-5 py-3 my-3  rounded-md cursor-pointer flex justify-between"
+    <Button
+      className=" text-2xl rounded-md w-full "
       onClick={generateNewDiary}
+      variant="default"
     >
-      <Heading size="sm" className="text-center w-full">
-        {"+"}
-      </Heading>
-      <DeleteIcon />
-    </Box>
+      +
+    </Button>
   );
 };
 

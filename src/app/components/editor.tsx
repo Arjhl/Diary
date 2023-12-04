@@ -1,36 +1,65 @@
 // this registers <Editor> as a Client Component
 "use client";
+import "../styles/editor.css";
 import { BlockNoteEditor } from "@blocknote/core";
-import { BlockNoteView, useBlockNote } from "@blocknote/react";
+import {
+  BlockNoteView,
+  darkDefaultTheme,
+  Theme,
+  useBlockNote,
+  lightDefaultTheme,
+} from "@blocknote/react";
 import "@blocknote/core/style.css";
-import DashboardHeader from "../components/DashboardHeader";
-import { useRouter } from "next/navigation";
-import { useState, useContext, useRef } from "react";
-import { UserContext } from "../store/userContext";
+
+import "@blocknote/core/style.css";
 import { useUploadThing } from "../utils/uploadThing";
 import { useLeavePageConfirm } from "../store/useLeavePageConfirm";
-import { Button, useToast, Input } from "@chakra-ui/react";
-import { v4 as uuid } from "uuid";
-const aesjs = require("aes-js");
-import encrypt from "../utils/encyrpt";
-import decrypt from "../utils/decrypt";
-import { saveDiary } from "../utils/handleDiaryData";
-import KeyInput from "./KeyInput";
+import { Input } from "./ui/input";
+import { useToast } from "./ui/use-toast";
+import { useTheme } from "next-themes";
 
 // Our <Editor> component we can reuse later
 
 type propTypes = {
   blockData: any;
   title: string;
-  id: string;
   getBlockData: Function;
   getTitle: Function;
+  editable: boolean;
+  date: string;
+};
+
+//blocknote editor theme
+
+const componentStyles = (theme: Theme) => ({
+  Editor: {
+    '[data-node-type="blockContainer"] *': {
+      FontFace: "custom",
+    },
+  },
+});
+
+// Default dark theme with additional component styles.
+const BlockTheme = {
+  light: {
+    ...lightDefaultTheme,
+    componentStyles,
+  },
+  dark: {
+    ...darkDefaultTheme,
+    componentStyles,
+  },
+} satisfies {
+  light: Theme;
+  dark: Theme;
 };
 
 export default function Editor(props: propTypes) {
-  const toast = useToast();
+  const { toast } = useToast();
+  const theme = useTheme();
+  console.log("Theme", theme.theme);
 
-  useLeavePageConfirm(false);
+  useLeavePageConfirm(true);
 
   const { startUpload, permittedFileInfo } = useUploadThing("imageUploader", {
     onClientUploadComplete: (res) => {
@@ -40,9 +69,8 @@ export default function Editor(props: propTypes) {
       toast({
         title: "Image upload failed",
         description: "Check if the file is below 4MB.",
-        status: "error",
+        variant: "destructive",
         duration: 9000,
-        isClosable: true,
       });
     },
   });
@@ -55,9 +83,19 @@ export default function Editor(props: propTypes) {
 
   // Creates a new editor instance.
 
-  const editor: BlockNoteEditor | null = useBlockNote({
+  const editor: BlockNoteEditor = useBlockNote({
     uploadFile: uploadFiles,
     initialContent: props.blockData,
+    editable: props.editable,
+    domAttributes: {
+      // Adds a class to all `blockContainer` elements.
+      blockContainer: {
+        class: "block-container",
+      },
+      editor: {
+        class: "editorClass",
+      },
+    },
   });
 
   editor.onEditorContentChange(() => {
@@ -68,16 +106,31 @@ export default function Editor(props: propTypes) {
 
   //make a new component for title
   return (
-    <div>
-      <p>{props.title}</p>
-      <Input
-        onChange={(e) => {
-          props.getTitle(e.target.value);
-        }}
-        placeholder="Enter title : this content will not be encrypted"
-        contentEditable
+    <div className="sm:text-xs">
+      {!props.editable && (
+        <div className="flex justify-between">
+          <p className=" font-normal text-sm my-2 text-muted-foreground sm:text-lg">
+            {props.title}
+          </p>
+          <p className=" font-normal text-sm my-2 text-muted-foreground sm:text-lg">
+            {props.date}
+          </p>
+        </div>
+      )}
+      {props.editable && (
+        <Input
+          onChange={(e: any) => {
+            props.getTitle(e.target.value);
+          }}
+          placeholder={props.title ? props.title : "Enter title"}
+          contentEditable
+          className=" font-normal text-xs sm:text-sm my-2 animate-in w-32"
+        />
+      )}
+      <BlockNoteView
+        editor={editor}
+        theme={theme.theme == "dark" ? BlockTheme.dark : BlockTheme.light}
       />
-      <BlockNoteView className=" bg-white" editor={editor} theme={"light"} />
     </div>
   );
 }

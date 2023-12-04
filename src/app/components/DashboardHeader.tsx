@@ -1,9 +1,15 @@
 "use client";
 import { useContext, useState } from "react";
 import { UserContext } from "../store/userContext";
-import logo from "../../../public/next.svg";
-import { Image, Heading, Input, Circle } from "@chakra-ui/react";
-import { EditIcon, CheckIcon } from "@chakra-ui/icons";
+import { Input } from "./ui/input";
+import { Check, Edit } from "lucide-react";
+import { ModeToggle } from "./ToggleTheme";
+import { Pencil } from "lucide-react";
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from "@/app/components/ui/avatar";
 
 const DashboardHeader = () => {
   const ctx = useContext(UserContext);
@@ -30,41 +36,48 @@ const DashboardHeader = () => {
   };
 
   return (
-    <div className="flex p-5 items-center gap-6 mx-10">
-      <Image
-        borderRadius="full"
-        boxSize="50px"
-        src="https://images.unsplash.com/photo-1553356084-58ef4a67b2a7?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-      />
-      {!edit && (
-        <Heading spellCheck="false">
-          {username.length == 0 ? "Add Username" : username}
-        </Heading>
-      )}
-      {edit && (
-        <Input
-          placeholder={ctx.userData.username}
-          onChange={(e) => {
-            setUsername(e.target.value);
-          }}
+    <div className="flex p-3 items-center justify-between border-secondary my-4 rounded-md  border-2 border-solid">
+      <Avatar>
+        <AvatarImage
+          src="https://utfs.io/f/7712b204-971e-4948-9c1e-3eb09fc645d3-b5u5r5.png"
+          className="object-cover"
         />
-      )}
-      {!edit && (
-        <EditIcon
-          onClick={() => {
-            setEdit(true);
-          }}
-        />
-      )}
-      {edit && (
-        <CheckIcon
-          onClick={() => {
-            setEdit(false);
-            usernameChangeHandler();
-          }}
-        />
-      )}
-      <Input />
+        <AvatarFallback>Logo</AvatarFallback>
+      </Avatar>
+      <div className="flex items-center gap-1">
+        {!edit && (
+          <h6 spellCheck="false" className=" text-2xl font-bold ">
+            {username.length == 0 ? "Add Username" : username}
+          </h6>
+        )}
+        {edit && (
+          <Input
+            placeholder={ctx.userData.username}
+            onChange={(e) => {
+              setUsername(e.target.value);
+            }}
+          />
+        )}
+        {!edit && (
+          <Pencil
+            className="h-3 cursor-pointer"
+            onClick={() => {
+              setEdit(true);
+            }}
+          />
+        )}
+        {edit && (
+          <Check
+            onClick={() => {
+              setEdit(false);
+              usernameChangeHandler();
+            }}
+          />
+        )}
+      </div>
+      <div className=" self-end">
+        <ModeToggle />
+      </div>
     </div>
   );
 };

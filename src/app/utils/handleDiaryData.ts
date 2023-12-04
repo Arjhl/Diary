@@ -77,3 +77,18 @@ export const getDiaryData = async (diaryId: string) => {
   const d = await response.json();
   return d;
 };
+
+export const deleteDiary = async (id: string) => {
+  const response = await fetch(`http://localhost:3000/api/diaries?id=${id}`, {
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      id,
+    }),
+  });
+  const d = await response.json();
+  console.log(d);
+  return d;
+};

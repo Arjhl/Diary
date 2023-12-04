@@ -1,4 +1,4 @@
-import { Button } from "@chakra-ui/react";
+import { Button } from "./ui/button";
 
 const MakePublicButton = () => {
   return <Button>Set public</Button>;

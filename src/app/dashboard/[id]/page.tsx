@@ -10,11 +10,11 @@ import KeyInput from "@/app/components/KeyInput";
 import ToggleEdit from "@/app/components/ToggleEdit";
 import DiaryToggle from "@/app/components/DiaryToggle";
 import { UserContext } from "@/app/store/userContext";
-import { useToast } from "@chakra-ui/react";
 import encrypt from "@/app/utils/encyrpt";
 import { useRouter } from "next/navigation";
 import KeyModal from "@/app/components/KeyModal";
 import { keyFormatter } from "@/app/utils/keyFormatter";
+import { useToast } from "@/app/components/ui/use-toast";
 
 const TextEditor = () => {
   const [blockData, setBlockData] = useState([]);
@@ -26,17 +26,23 @@ const TextEditor = () => {
   const [isPublic, setIsPublic] = useState(false);
   const params = useParams();
   console.log(params);
-  const toast = useToast();
+  const { toast } = useToast();
   const router = useRouter();
+  const [diaryDate, setDiaryDate] = useState("");
 
   const getDiaryBlocks = async () => {
     // take the param id and get the diary data
     const res = await getDiaryData(params.id.toString());
+    setDiaryDate(
+      `${new Date(res.createdAt).getDate()}-${
+        new Date(res.createdAt).getMonth() + 1
+      }-${new Date(res.createdAt).getFullYear()}`
+    );
     if (res.isPublic) {
       console.log("public diary");
       setIsPublic(true);
       setTitle(res.title);
-      if (res.diary.trim() == "") {
+      if (res.title.trim() == "") {
         setEditMode(true);
       }
       return;
@@ -45,9 +51,8 @@ const TextEditor = () => {
       toast({
         title: "Enter key.",
         description: "Enter the key to get the content.",
-        status: "error",
+        variant: "destructive",
         duration: 9000,
-        isClosable: true,
       });
       return;
     }
@@ -57,11 +62,12 @@ const TextEditor = () => {
     try {
       setTitle(res.title);
       setIsPublic(res.isPublic);
+
       const block = decrypt(res?.diary, keyFormatter(ctx.key.toString()));
       console.log(block);
       setBlockData(block);
       setIsLoading(true);
-      if (res.diary.trim() == "") {
+      if (res.title.trim() == "") {
         setEditMode(true);
       }
     } catch (err) {
@@ -94,6 +100,14 @@ const TextEditor = () => {
 
   const saveDataToDb = async () => {
     // const newUuid = uuid();
+    if (title.trim() == "") {
+      toast({
+        title: "Title is compulsory.",
+        variant: "destructive",
+        duration: 9000,
+      });
+      return false;
+    }
 
     if (!isPublic) {
       if (ctx.key.length == 0 || ctx.key == undefined) {
@@ -101,9 +115,8 @@ const TextEditor = () => {
           title: "No KEY is specified.",
           description:
             "Enter the key and then save again to save your diary to the database.",
-          status: "error",
+          variant: "destructive",
           duration: 9000,
-          isClosable: true,
         });
         return false;
       }
@@ -148,9 +161,8 @@ const TextEditor = () => {
       toast({
         title: "General Key / Account Key is required.",
         description: "Update the account key to make this diary private",
-        status: "error",
+        variant: "destructive",
         duration: 9000,
-        isClosable: true,
       });
       return false;
     }
@@ -162,26 +174,28 @@ const TextEditor = () => {
     //get ctx.kkey
     const encryptedData = encrypt(data, keyFormatter(ctx.key));
     console.log(ctx.key, encryptedData);
-    saveDiary(
-      encryptedData,
-      title,
-      params.id.toString(),
-      ctx.userData.id,
-      false
-    );
-    setIsPublic(false);
-    return true;
+    if (encryptedData) {
+      saveDiary(
+        encryptedData,
+        title,
+        params.id.toString(),
+        ctx.userData.id,
+        false
+      );
+      setIsPublic(false);
+      return true;
+    }
   };
 
   const setPublicKey = async (key: string) => {
-    console.log("Setting key", key);
     setKey(key);
     const res = await getDiaryData(params.id.toString());
     setTitle(res.title);
-    setIsPublic(res.isPublic);
+
     const block = decrypt(res?.diary, keyFormatter(key));
     console.log(block);
     setBlockData(block);
+    setIsPublic(true);
     setIsLoading(true);
   };
 
@@ -191,38 +205,48 @@ const TextEditor = () => {
   };
 
   return (
-    <div>
+    <div className="mx-2 my-2 sm:m-10">
       <DashboardHeader />
-      <KeyInput onKeyChange={keyChangeHandler} />
-      {isLoading && (
-        <div className="flex">
-          <ToggleEdit
-            saveHandler={saveDataToDb}
-            setEdit={setEdit}
-            edit={editMode}
-          />
+      <div className="flex p-4 flex-col justify-center h-auto sm:flex-row items-center sm:justify-between  bg-primary-foreground sm:px-3 sm:py-0 rounded-md ">
+        <KeyInput onKeyChange={keyChangeHandler} />
+        {isLoading && (
+          <div className="flex gap-2 items-center justify-center sm:gap-5 ">
+            <ToggleEdit
+              saveHandler={saveDataToDb}
+              setEdit={setEdit}
+              edit={editMode}
+            />
 
-          <DiaryToggle
-            isPublic={isPublic}
-            setPublic={makePublic}
-            makePrivate={makePrivate}
-          />
-        </div>
-      )}
+            <DiaryToggle
+              isPublic={isPublic}
+              setPublic={makePublic}
+              makePrivate={makePrivate}
+            />
+          </div>
+        )}
+      </div>
       {isLoading && editMode && (
         <>
           <Editor
             blockData={blockData}
             title={title}
-            id={params.id.toString()}
             getBlockData={getBlockData}
             getTitle={getTitle}
+            editable={true}
+            date={diaryDate}
           />
         </>
       )}
       {!editMode && isLoading && (
         <>
-          <ReadonlyDiary blockData={blockData} />
+          <Editor
+            blockData={blockData}
+            title={title}
+            getBlockData={getBlockData}
+            getTitle={getTitle}
+            editable={false}
+            date={diaryDate}
+          />
         </>
       )}
       {isPublic && <KeyModal setKey={setPublicKey} isPublic={isPublic} />}
