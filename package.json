@@ -1,5 +1,5 @@
 {
-  "name": "my-app",
+  "name": "CipherJournal",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -29,6 +29,7 @@
     "html-react-parser": "^5.0.6",
     "lucide-react": "^0.294.0",
     "next": "14.0.3",
+    "next-absolute-url": "^1.2.2",
     "next-themes": "^0.2.1",
     "react": "^18",
     "react-dom": "^18",
