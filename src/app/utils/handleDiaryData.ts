@@ -1,4 +1,5 @@
 //save  , getDiaryList and getContent(of a diary)
+import { baseurl } from "./constants";
 
 export const saveDiary = async (
   data: string,
@@ -16,16 +17,13 @@ export const saveDiary = async (
   };
 
   console.log(resObj);
-  const response = await fetch(
-    `${process.env.NEXT_PUBLIC_BASE_URL}/api/diaries`,
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(resObj),
-    }
-  );
+  const response = await fetch(`${baseurl}/api/diaries`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(resObj),
+  });
   const d = await response.json();
   return d;
 };
@@ -36,70 +34,58 @@ export const update = async (
   title: string,
   userid: string
 ) => {
-  const response = await fetch(
-    `${process.env.NEXT_PUBLIC_BASE_URL}/api/diaries`,
-    {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        id: id,
-        userid: userid,
-        diary: data,
-        title: title,
-      }),
-    }
-  );
+  const response = await fetch(`${baseurl}/api/diaries`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      id: id,
+      userid: userid,
+      diary: data,
+      title: title,
+    }),
+  });
   const d = await response.json();
   return d;
 };
 
 export const getAllDiaryList = async (userid: string) => {
-  const response = await fetch(
-    `${process.env.NEXT_PUBLIC_BASE_URL}/api/diaries`,
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        list: true,
-        userid: userid,
-      }),
-    }
-  );
+  const response = await fetch(`${baseurl}/api/diaries`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      list: true,
+      userid: userid,
+    }),
+  });
   const d = await response.json();
   return d;
 };
 
 export const getDiaryData = async (diaryId: string) => {
-  const response = await fetch(
-    `${process.env.NEXT_PUBLIC_BASE_URL}/api/diaries?id=${diaryId}`,
-    {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    }
-  );
+  const response = await fetch(`${baseurl}/api/diaries?id=${diaryId}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
   const d = await response.json();
   return d;
 };
 
 export const deleteDiary = async (id: string) => {
-  const response = await fetch(
-    `${process.env.NEXT_PUBLIC_BASE_URL}/api/diaries?id=${id}`,
-    {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        id,
-      }),
-    }
-  );
+  const response = await fetch(`${baseurl}/api/diaries?id=${id}`, {
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      id,
+    }),
+  });
   const d = await response.json();
   console.log(d);
   return d;

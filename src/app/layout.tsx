@@ -5,6 +5,7 @@ import { ClerkProvider } from "@clerk/nextjs";
 import { Providers } from "./Providers";
 import { currentUser } from "@clerk/nextjs";
 const inter = Inter({ subsets: ["latin"] });
+import { baseurl } from "./utils/constants";
 
 export const dynamic = "force-dynamic";
 
@@ -23,19 +24,16 @@ export default function RootLayout({
     const email = user?.emailAddresses[0].emailAddress.toString();
     const id = user?.emailAddresses[0].id;
 
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_BASE_URL}/api/user`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email,
-          id,
-        }),
-      }
-    );
+    const response = await fetch(`${baseurl}/api/user`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        email,
+        id,
+      }),
+    });
     const data = await response.json();
     console.log(data);
 

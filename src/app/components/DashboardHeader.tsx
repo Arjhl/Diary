@@ -10,6 +10,7 @@ import {
   AvatarFallback,
   AvatarImage,
 } from "@/app/components/ui/avatar";
+import { baseurl } from "../utils/constants";
 
 const DashboardHeader = () => {
   const ctx = useContext(UserContext);
@@ -24,16 +25,13 @@ const DashboardHeader = () => {
       username,
     };
 
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_BASE_URL}/api/user`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(reqBody),
-      }
-    );
+    const response = await fetch(`${baseurl}/api/user`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(reqBody),
+    });
     const data = await response.json();
     console.log(data);
   };
