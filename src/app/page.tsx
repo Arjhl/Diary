@@ -43,7 +43,7 @@ export default function Home() {
             </div>
           )}
           {isSignedIn && (
-            <Button onClick={redirectToDashboard}>Get Started</Button>
+            <Button onClick={redirectToDashboard}>Dashboard</Button>
           )}
         </div>
       </div>
