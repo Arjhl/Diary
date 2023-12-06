@@ -17,7 +17,7 @@ import { keyFormatter } from "@/app/utils/keyFormatter";
 import { useToast } from "@/app/components/ui/use-toast";
 
 const TextEditor = () => {
-  const [blockData, setBlockData] = useState([]);
+  const [blockData, setBlockData] = useState<any>([]);
   const ctx = useContext(UserContext);
   const [isLoading, setIsLoading] = useState(false);
   const [editMode, setEditMode] = useState(false);
@@ -34,17 +34,18 @@ const TextEditor = () => {
     // take the param id and get the diary data
     const res = await getDiaryData(params.id.toString());
     setDiaryDate(
-      `${new Date(res.createdAt).getDate()}-${
-        new Date(res.createdAt).getMonth() + 1
-      }-${new Date(res.createdAt).getFullYear()}`
+      `${new Date(res?.createdAt).getDate()}-${
+        new Date(res?.createdAt).getMonth() + 1
+      }-${new Date(res?.createdAt).getFullYear()}`
     );
-    if (res.isPublic) {
+    if (res?.isPublic) {
       console.log("public diary");
       setIsPublic(true);
       setTitle(res.title);
       if (res.title.trim() == "") {
         setEditMode(true);
       }
+      setBlockData([res.diary.toString()]);
       return;
     }
     if (!ctx.key && !res.isPublic) {
@@ -71,7 +72,7 @@ const TextEditor = () => {
         setEditMode(true);
       }
     } catch (err) {
-      alert("Provided Key Might is not correct" + err);
+      alert("Provided Key is not correct" + err);
     }
   };
 
@@ -100,6 +101,7 @@ const TextEditor = () => {
 
   const saveDataToDb = async () => {
     // const newUuid = uuid();
+    console.log(isPublic);
     if (title.trim() == "") {
       toast({
         title: "Title is compulsory.",
@@ -109,19 +111,16 @@ const TextEditor = () => {
       return false;
     }
 
-    if (!isPublic) {
-      if (ctx.key.length == 0 || ctx.key == undefined) {
-        toast({
-          title: "No KEY is specified.",
-          description:
-            "Enter the key and then save again to save your diary to the database.",
-          variant: "destructive",
-          duration: 9000,
-        });
-        return false;
-      }
+    if (ctx.key.length == 0 || ctx.key == undefined) {
+      toast({
+        title: "No KEY is specified.",
+        description:
+          "Enter the key and then save again to save your diary to the database.",
+        variant: "destructive",
+        duration: 9000,
+      });
+      return false;
     }
-    console.log(isPublic, key, ctx.key);
 
     const diaryEncrypted = encrypt(
       blockData,
@@ -133,8 +132,9 @@ const TextEditor = () => {
       title,
       params.id.toString(),
       ctx.userData.id,
-      false
+      isPublic
     );
+
     return true;
   };
 
@@ -142,7 +142,7 @@ const TextEditor = () => {
     //get the key , then when saved encrypt it using the key
 
     const encryptedData = encrypt(blockData, keyFormatter(key));
-    console.log(encryptedData);
+    if (encryptedData) setIsPublic(true);
     //save the encrypted data
     saveDiary(
       encryptedData,
@@ -157,7 +157,7 @@ const TextEditor = () => {
   const makePrivate = async (key: string) => {
     //decrypts the given blockdata using the public key , then encrypts using ctx.key then store it
     console.log("Making Private", key);
-    if (ctx.key == "") {
+    if (ctx.key == "" || !ctx.key) {
       toast({
         title: "General Key / Account Key is required.",
         description: "Update the account key to make this diary private",
@@ -249,7 +249,9 @@ const TextEditor = () => {
           />
         </>
       )}
-      {isPublic && <KeyModal setKey={setPublicKey} isPublic={isPublic} />}
+      {isPublic && key.length == 0 && (
+        <KeyModal setKey={setPublicKey} isPublic={isPublic} />
+      )}
     </div>
   );
 };

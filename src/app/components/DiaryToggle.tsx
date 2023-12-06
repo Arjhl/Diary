@@ -8,6 +8,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/app/components/ui/dialog";
+import { baseurl } from "../utils/constants";
 import { useEffect, useRef, useState } from "react";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
@@ -34,7 +35,7 @@ const DiaryToggle = (props: propTypes) => {
     }
   }, [props]);
 
-  const saveHandler = () => {
+  const saveHandler = async () => {
     if (key?.length != 8) {
       toast({
         title: "Key Not Entered.",
@@ -45,7 +46,8 @@ const DiaryToggle = (props: propTypes) => {
     }
     if (key.length == 8) {
       if (props.isPublic) {
-        const res = props.makePrivate(key);
+        const res = await props.makePrivate(key);
+        console.log(res);
         if (res) {
           setIsDiaryPublic(false);
           toast({
@@ -60,7 +62,7 @@ const DiaryToggle = (props: propTypes) => {
           action: (
             <Button
               onClick={() => {
-                router.push(`http://localhost:3000/public/${params.id}`);
+                router.push(`${baseurl}/public/${params.id}`);
               }}
               variant="outline"
             >
